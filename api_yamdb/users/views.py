@@ -63,6 +63,9 @@ class SignUpViewSet(viewsets.ModelViewSet):
         email = serializer.validated_data['email']
         username = serializer.validated_data['username']
 
+        if User.objects.filter(email=email, username=username).exists():
+            return Response(status=status.HTTP_200_OK)
+
         if User.objects.filter(email=email).exists():
             return Response(
                 {'email': 'Пользователь с таким email уже существует'},
