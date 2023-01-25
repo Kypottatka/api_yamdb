@@ -2,7 +2,6 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from . import views
-from .views import get_jwt_token
 
 
 app_name = 'users'
@@ -19,6 +18,11 @@ v1_router.register(
     views.SignUpViewSet,
     basename='signup',
 )
+v1_router.register(
+    'token',
+    views.GetJWTToken,
+    basename='token',
+)
 
 
 urlpatterns = [
@@ -26,11 +30,6 @@ urlpatterns = [
     path(
         'auth/',
         include(v1_router.urls)
-    ),
-    path(
-        'auth/token/',
-        get_jwt_token,
-        name='token_obtain_pair'
     ),
     path(
         'auth/',

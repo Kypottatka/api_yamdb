@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status, filters
 from rest_framework.permissions import (
@@ -17,38 +17,37 @@ from rest_framework_simplejwt.tokens import AccessToken
 from .serializers import (
     UserSerializer,
     SignUpSerializer,
+    TokenSerializer,
 )
 from .models import User
 from .permissions import IsAdmin
 from .pagination import UsersPagination
 
 
-@api_view(['POST'])
-def get_jwt_token(request):
-    serializer = UserSerializer(data=request.data)
+class GetJWTToken(viewsets.ModelViewSet):
+    serializer_class = TokenSerializer
+    permission_classes = (AllowAny,)
+    http_method_names = ['post']
 
-    if serializer.is_valid():
-        username = serializer.validated_data['username']
-        email = serializer.validated_data['email']
-        confirmation_code = serializer.data['confirmation_code']
-        user = get_object_or_404(User, username=username, email=email)
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
 
-        if check_password(confirmation_code, user.confirmation_code):
-            token = AccessToken.for_user(user)
-            return Response(
-                {'token': f'{token}'},
-                status=status.HTTP_200_OK
-            )
+        if serializer.is_valid():
+            username = serializer.data['username']
+            confirmation_code = serializer.data['confirmation_code']
+            user = get_object_or_404(User, username=username)
+
+            if check_password(confirmation_code, user.confirmation_code):
+                token = AccessToken.for_user(user)
+                return Response(
+                    {'token': f'{token}'},
+                    status=status.HTTP_200_OK
+                )
 
         return Response(
-            {'confirmation_code': 'Не верный код подтверждения'},
+            serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
-
-    return Response(
-        serializer.errors,
-        status=status.HTTP_400_BAD_REQUEST
-    )
 
 
 class SignUpViewSet(viewsets.ModelViewSet):
@@ -66,12 +65,12 @@ class SignUpViewSet(viewsets.ModelViewSet):
         if User.objects.filter(email=email, username=username).exists():
             return Response(status=status.HTTP_200_OK)
 
-        if User.objects.filter(email=email).exists():
+        elif User.objects.filter(email=email).exists():
             return Response(
                 {'email': 'Пользователь с таким email уже существует'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if User.objects.filter(username=username).exists():
+        elif User.objects.filter(username=username).exists():
             return Response(
                 {'username': 'Пользователь с таким username уже существует'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -148,3 +147,11 @@ class UserViewSet(viewsets.ModelViewSet):
         user = get_object_or_404(User, username=request.data['username'])
         user.delete()
         return Response(status=403)
+
+    def update(self, request, *args, **kwargs):
+        if request.method == 'PUT':
+            return Response(
+                {'detail': 'Метод PUT не разрешен'},
+                status=405
+            )
+        return super().update(request, *args, **kwargs)
