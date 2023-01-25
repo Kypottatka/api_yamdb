@@ -4,31 +4,31 @@ from rest_framework import viewsets, filters
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .serializers import CategoriesSerializer, GenresSerializer, TitlesSerializer, CommentSerializer, ReviewSerializer
+from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, CommentSerializer, ReviewSerializer
 from reviews.models import Categories, Genres, Titles, Review, Comment
 
 User = get_user_model()
 
 
-class CategoriesViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Categories.objects.all()
-    serializer_class = CategoriesSerializer
+    serializer_class = CategorySerializer
     permission_classes = (AllowAny,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
 
-class GenresViewSet(viewsets.ModelViewSet):
-    queryset = Genres.objects.all()
-    serializer_class = GenresSerializer
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
     permission_classes = (AllowAny,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
 
-class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Titles.objects.all()
-    serializer_class = TitlesSerializer
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
     permission_classes = (AllowAny,)
 
 
