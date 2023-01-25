@@ -2,12 +2,12 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from reviews.models import Categories, Genres, Titles, Review, Comment
+from reviews.models import Category, Genre, Title, Review, Comment
 
 User = get_user_model()
 
 
-class CategoriesSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     name = serializers.SlugRelatedField(slug_field='name',
                                         read_only=True)
 
@@ -17,7 +17,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
         model = Categories
 
 
-class GenresSerializer(serializers.ModelSerializer):
+class GenreSerializer(serializers.ModelSerializer):
     name = serializers.SlugRelatedField(slug_field='name',
                                         read_only=True)
 
@@ -27,7 +27,7 @@ class GenresSerializer(serializers.ModelSerializer):
         model = Genres
 
 
-class TitlesSerializer(serializers.ModelSerializer):
+class TitleSerializer(serializers.ModelSerializer):
     name = serializers.SlugRelatedField(slug_field='name',
                                         read_only=True)
     genre = serializers.SlugRelatedField(
