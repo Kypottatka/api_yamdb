@@ -1,8 +1,35 @@
-from rest_framework import viewsets
-from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 
-from api.serializers import CommentSerializer, ReviewSerializer
-from reviews.models import Review, Comment, Title
+from rest_framework import viewsets, filters
+from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
+from .serializers import CategoriesSerializer, GenresSerializer, TitlesSerializer, CommentSerializer, ReviewSerializer
+from reviews.models import Categories, Genres, Titles, Review, Comment
+
+User = get_user_model()
+
+
+class CategoriesViewSet(viewsets.ModelViewSet):
+    queryset = Categories.objects.all()
+    serializer_class = CategoriesSerializer
+    permission_classes = (AllowAny,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+
+
+class GenresViewSet(viewsets.ModelViewSet):
+    queryset = Genres.objects.all()
+    serializer_class = GenresSerializer
+    permission_classes = (AllowAny,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+
+
+class TitlesViewSet(viewsets.ModelViewSet):
+    queryset = Titles.objects.all()
+    serializer_class = TitlesSerializer
+    permission_classes = (AllowAny,)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -47,3 +74,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment_id = self.kwargs.get("comment_id")
         comment = get_object_or_404(Comment, id=comment_id)
         comment.delete()
+    
