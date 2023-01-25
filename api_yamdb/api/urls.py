@@ -12,4 +12,7 @@ v1_router.register('titles', TitlesViewSet, basename='titles')
 
 urlpatterns = [
     path('v1/', include(v1_router.urls))
+],
+urlpatterns = [
+    path('v1/', include('users.urls')),
 ]
