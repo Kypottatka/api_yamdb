@@ -6,14 +6,6 @@ from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    def validate(self, data):
-        email = data.get('email')
-        if email and User.objects.filter(email=email).exists():
-            raise serializers.ValidationError(
-                'Пользователь с таким email '
-                'уже существует'
-            )
-        return data
 
     class Meta:
         model = User
@@ -52,3 +44,8 @@ class SignUpSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+
+
+class TokenSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
