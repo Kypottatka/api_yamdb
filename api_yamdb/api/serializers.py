@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from api_yamdb.api_yamdb.reviews.models import Categories, Genres, Titles
+from reviews.models import Categories, Genres, Titles
 
 User = get_user_model()
 
