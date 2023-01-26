@@ -11,7 +11,6 @@ from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
 )
-from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .serializers import (
@@ -65,16 +64,13 @@ class SignUpViewSet(viewsets.ModelViewSet):
         if User.objects.filter(email=email, username=username).exists():
             return Response(status=status.HTTP_200_OK)
 
-        elif User.objects.filter(email=email).exists():
+        elif (
+            User.objects.filter(email=email).exists()
+                or User.objects.filter(username=username).exists()):
             return Response(
-                {'email': 'Пользователь с таким email уже существует'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        elif User.objects.filter(username=username).exists():
-            return Response(
-                {'username': 'Пользователь с таким username уже существует'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 

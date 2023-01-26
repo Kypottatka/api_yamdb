@@ -13,8 +13,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'
-        exclude = ('id',)
-        model = Categories
+        model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -23,24 +22,23 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'
-        exclude = ('id',)
-        model = Genres
+        model = Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
     name = serializers.SlugRelatedField(slug_field='name',
                                         read_only=True)
     genre = serializers.SlugRelatedField(
-        queryset=Genres.objects.all(), slug_field='slug',
+        queryset=Genre.objects.all(), slug_field='slug',
         many=True
     )
     category = serializers.SlugRelatedField(
-        queryset=Categories.objects.all(), slug_field='slug'
+        queryset=Category.objects.all(), slug_field='slug'
     )
 
     class Meta:
         fields = '__all__'
-        model = Titles
+        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -88,8 +86,10 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
 
 
+"""
 class RatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rating
         fields = ("rate",)
+"""

@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import Categories, Genres, Titles
+from .models import Category, Genre, Title
 
 
-@admin.register(Categories)
+@admin.register(Category)
 class CategoriesAdmin(admin.ModelAdmin):
     list_display = (
         'name',
@@ -13,7 +13,7 @@ class CategoriesAdmin(admin.ModelAdmin):
     list_filter = ('slug',)
 
 
-@admin.register(Genres)
+@admin.register(Genre)
 class GenresAdmin(admin.ModelAdmin):
     list_display = (
         'name',
@@ -23,7 +23,7 @@ class GenresAdmin(admin.ModelAdmin):
     list_filter = ('slug',)
 
 
-@admin.register(Titles)
+@admin.register(Title)
 class TitlesAdmin(admin.ModelAdmin):
     list_display = (
         'name',

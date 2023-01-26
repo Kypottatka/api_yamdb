@@ -4,14 +4,20 @@ from rest_framework import viewsets, filters
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, CommentSerializer, ReviewSerializer
-from reviews.models import Categories, Genres, Titles, Review, Comment
+from .serializers import (
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer,
+    CommentSerializer,
+    ReviewSerializer
+)
+from reviews.models import Category, Genre, Title, Review, Comment
 
 User = get_user_model()
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Categories.objects.all()
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (AllowAny,)
     filter_backends = (filters.SearchFilter,)
@@ -74,4 +80,3 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment_id = self.kwargs.get("comment_id")
         comment = get_object_or_404(Comment, id=comment_id)
         comment.delete()
-    
