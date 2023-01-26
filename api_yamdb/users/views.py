@@ -110,7 +110,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = UserSerializer(request.user)
             return Response(
                 serializer.data,
-                status=200
+                status=status.HTTP_200_OK,
             )
         serializer = UserSerializer(
             request.user,
@@ -119,7 +119,10 @@ class UserViewSet(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save(role=request.user.role, partial=True)
-        return Response(serializer.data, status=200)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
 
     @action(
         detail=False,
@@ -129,16 +132,16 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.user.role != 'admin':
             return Response(
                 {'detail': 'У вас нет прав на удаление пользователей'},
-                status=403
+                status=status.HTTP_403_FORBIDDEN
             )
         user = get_object_or_404(User, username=request.data['username'])
         user.delete()
-        return Response(status=403)
+        return Response(status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':
             return Response(
                 {'detail': 'Метод PUT не разрешен'},
-                status=405
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
             )
         return super().update(request, *args, **kwargs)
