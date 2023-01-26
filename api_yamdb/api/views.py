@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
 
 from rest_framework import viewsets, filters
-from rest_framework.pagination import LimitOffsetPagination
 
 from users.permissions import IsAdminOrReadOnly
+from .pagination import CustomPagination
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
 from reviews.models import Category, Genre, Title
 
@@ -16,6 +16,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    pagination_class = CustomPagination
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -24,6 +25,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    pagination_class = CustomPagination
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -31,4 +33,4 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     ordering_fields = ('name',)
-    pagination_class = LimitOffsetPagination
+    pagination_class = CustomPagination
