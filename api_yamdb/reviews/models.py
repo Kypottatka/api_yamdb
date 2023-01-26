@@ -1,20 +1,16 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
+
 from django.db import models
 
-from users.models import User
+User = get_user_model()
 
 
 class Category(models.Model):
-    name = models.CharField(
-        max_length=256,
-        verbose_name='Название',
-        help_text='Заполните имя категории'
-    )
-    slug = models.SlugField(
-        max_length=50,
-        unique=True,
-        help_text='Поле с уникальным значением'
-    )
+    name = models.CharField(max_length=256, verbose_name='Название',
+                            help_text='Заполните имя категории')
+    slug = models.SlugField(max_length=50, unique=True,
+                            help_text='Поле с уникальным значением')
 
     class Meta:
         ordering = ('name',)
@@ -25,17 +21,12 @@ class Category(models.Model):
         return self.name
 
 
+
 class Genre(models.Model):
-    name = models.CharField(
-        max_length=256,
-        verbose_name='Название',
-        help_text='Заполните имя жанра'
-    )
-    slug = models.SlugField(
-        max_length=50,
-        unique=True,
-        help_text='Поле с уникальным значением'
-    )
+    name = models.CharField(max_length=256, verbose_name='Название',
+                            help_text='Заполните имя жанра')
+    slug = models.SlugField(max_length=50, unique=True,
+                            help_text='Поле с уникальным значением')
 
     class Meta:
         ordering = ('name',)
@@ -47,21 +38,13 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-    name = models.CharField(
-        max_length=256,
-        verbose_name='Название',
-        help_text='Заполните название произведения'
-    )
+    name = models.CharField(max_length=256, verbose_name='Название',
+                            help_text='Заполните название произведения')
     year = models.IntegerField(
-        verbose_name='Год выпуска',
-        help_text='Заполните год выпуска'
-    )
-    description = models.TextField(
-        blank=True,
-        null=True,
-        verbose_name='описание',
-        help_text='Заполните описание'
-    )
+        verbose_name='Год выпуска', help_text='Заполните год выпуска')
+    description = models.TextField(blank=True, null=True,
+                                   verbose_name='описание',
+                                   help_text='Заполните описание')
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL, blank=True,
