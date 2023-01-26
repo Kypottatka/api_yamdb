@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 
 from rest_framework import viewsets, filters
+from rest_framework.pagination import LimitOffsetPagination
 
 from users.permissions import IsAdminOrReadOnly
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
@@ -29,3 +30,5 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
+    ordering_fields = ('name',)
+    pagination_class = LimitOffsetPagination

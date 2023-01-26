@@ -7,8 +7,6 @@ User = get_user_model()
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.SlugRelatedField(slug_field='name',
-                                        read_only=True)
 
     class Meta:
         fields = '__all__'
@@ -16,8 +14,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    name = serializers.SlugRelatedField(slug_field='name',
-                                        read_only=True)
 
     class Meta:
         fields = '__all__'
@@ -25,8 +21,6 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    name = serializers.SlugRelatedField(slug_field='name',
-                                        read_only=True)
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(), slug_field='slug',
         many=True
