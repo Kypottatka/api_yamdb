@@ -1,31 +1,31 @@
 from django.contrib.auth import get_user_model
 
 from rest_framework import viewsets, filters
-from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .serializers import CategoriesSerializer, GenresSerializer, TitlesSerializer
-from reviews.models import Categories, Genres, Titles
+from users.permissions import IsAdminOrReadOnly
+from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
+from reviews.models import Category, Genre, Title
 
 User = get_user_model()
 
 
-class CategoriesViewSet(viewsets.ModelViewSet):
-    queryset = Categories.objects.all()
-    serializer_class = CategoriesSerializer
-    permission_classes = (AllowAny,)
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
 
-class GenresViewSet(viewsets.ModelViewSet):
-    queryset = Genres.objects.all()
-    serializer_class = GenresSerializer
-    permission_classes = (AllowAny,)
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
 
-class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Titles.objects.all()
-    serializer_class = TitlesSerializer
-    permission_classes = (AllowAny,)
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = (IsAdminOrReadOnly,)
