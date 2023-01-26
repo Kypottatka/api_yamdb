@@ -6,19 +6,19 @@ from . import views
 
 app_name = 'users'
 
-v1_router = DefaultRouter()
+users_router = DefaultRouter()
 
-v1_router.register(
+users_router.register(
     'users',
     views.UserViewSet,
     basename='users',
 )
-v1_router.register(
+users_router.register(
     'signup',
     views.SignUpViewSet,
     basename='signup',
 )
-v1_router.register(
+users_router.register(
     'token',
     views.GetJWTToken,
     basename='token',
@@ -26,10 +26,10 @@ v1_router.register(
 
 
 urlpatterns = [
-    path('', include(v1_router.urls)),
+    path('', include(users_router.urls)),
     path(
         'auth/',
-        include(v1_router.urls)
+        include(users_router.urls)
     ),
     path(
         'auth/',

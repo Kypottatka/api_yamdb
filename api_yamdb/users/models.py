@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core import validators
 
@@ -12,30 +12,6 @@ ROLES = [
     (MODERATOR, 'Модератор'),
     (ADMIN, 'Администратор'),
 ]
-
-
-class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **kwargs):
-        new_user = self.model(
-            email=email,
-            **kwargs
-        )
-
-        new_user.set_password(password)
-        new_user.save()
-        return new_user
-
-    def create_superuser(self, email, password, **kwargs):
-        new_user = self.model(
-            email=email,
-            is_staff=True,
-            is_superuser=True,
-            **kwargs
-        )
-
-        new_user.set_password(password)
-        new_user.save()
-        return new_user
 
 
 class User(AbstractUser):
@@ -83,7 +59,6 @@ class User(AbstractUser):
         max_length=150,
         null=True,
     )
-    objects = UserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

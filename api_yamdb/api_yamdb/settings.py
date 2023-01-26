@@ -134,7 +134,3 @@ SIMPLE_JWT = {
 }
 
 EMAIL_ADMIN = 'admin@example.com'
-
-USER = 'user'
-MODERATOR = 'moderator'
-ADMIN = 'admin'

@@ -4,13 +4,10 @@ from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import viewsets, status, filters
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .serializers import (
@@ -25,23 +22,20 @@ from .pagination import UsersPagination
 
 class GetJWTToken(viewsets.ModelViewSet):
     serializer_class = TokenSerializer
-    permission_classes = (AllowAny,)
-    http_method_names = ['post']
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        username = serializer.validated_data['username']
+        confirmation_code = serializer.validated_data['confirmation_code']
+        user = get_object_or_404(User, username=username)
 
-        if serializer.is_valid():
-            username = serializer.data['username']
-            confirmation_code = serializer.data['confirmation_code']
-            user = get_object_or_404(User, username=username)
-
-            if check_password(confirmation_code, user.confirmation_code):
-                token = AccessToken.for_user(user)
-                return Response(
-                    {'token': f'{token}'},
-                    status=status.HTTP_200_OK
-                )
+        if check_password(confirmation_code, user.confirmation_code):
+            token = AccessToken.for_user(user)
+            return Response(
+                {'token': f'{token}'},
+                status=status.HTTP_200_OK
+            )
 
         return Response(
             serializer.errors,
@@ -50,10 +44,7 @@ class GetJWTToken(viewsets.ModelViewSet):
 
 
 class SignUpViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
     serializer_class = SignUpSerializer
-    permission_classes = (AllowAny,)
-    http_method_names = ['post']
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -73,9 +64,9 @@ class SignUpViewSet(viewsets.ModelViewSet):
 
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-
         confirmation_code = uuid.uuid4()
         user = User.objects.filter(email=email).exists()
+
         if not user:
             User.objects.create_user(email=email)
 
@@ -104,9 +95,9 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAdmin, IsAuthenticated,)
     pagination_class = UsersPagination
-    lookup_field = 'username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['username', ]
+    lookup_field = 'username'
 
     @action(
         detail=False,
