@@ -6,6 +6,7 @@ from users.permissions import IsAdminOrReadOnly
 from .pagination import CustomPagination
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
 from reviews.models import Category, Genre, Title
+from .mixins import CreateListViewSet
 
 User = get_user_model()
 
@@ -19,13 +20,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CreateListViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     pagination_class = CustomPagination
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
