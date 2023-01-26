@@ -11,7 +11,7 @@ from .mixins import CreateListViewSet
 User = get_user_model()
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(CreateListViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
