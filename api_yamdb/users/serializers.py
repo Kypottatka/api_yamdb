@@ -6,21 +6,20 @@ from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = (
-            'first_name',
-            'last_name',
-            'username',
-            'email',
-            'bio',
-            'role',
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "bio",
+            "role",
         )
-        lookup_field = 'username'
+        lookup_field = "username"
         extra_kwargs = {
-            'email': {'required': True},
-            'url': {'lookup_field': 'username'},
+            "email": {"required": True},
+            "url": {"lookup_field": "username"},
         }
 
 
@@ -29,14 +28,12 @@ class SignUpSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=254, required=True)
 
     def validate_username(self, username):
-        if username == 'me':
+        if username == "me":
+            raise serializers.ValidationError("Недопустимое имя пользователя!")
+        if not re.match(r"^[\w.@+-]+\Z", username):
             raise serializers.ValidationError(
-                'Недопустимое имя пользователя!'
-            )
-        if not re.match(r'^[\w.@+-]+\Z', username):
-            raise serializers.ValidationError(
-                'Имя пользователя должно состоять '
-                'только из букв латинского алфавита, '
+                "Имя пользователя должно состоять "
+                "только из букв латинского алфавита, "
                 'цифр и символов "@/./+/-/_"'
             )
         return username

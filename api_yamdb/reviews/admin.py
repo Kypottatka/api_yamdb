@@ -6,29 +6,29 @@ from .models import Category, Genre, Title
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = (
-        'name',
-        'slug',
+        "name",
+        "slug",
     )
-    search_fields = ('slug',)
-    list_filter = ('slug',)
+    search_fields = ("slug",)
+    list_filter = ("slug",)
 
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
     list_display = (
-        'name',
-        'slug',
+        "name",
+        "slug",
     )
-    search_fields = ('slug',)
-    list_filter = ('slug',)
+    search_fields = ("slug",)
+    list_filter = ("slug",)
 
 
 @admin.register(Title)
 class TitlesAdmin(admin.ModelAdmin):
     list_display = (
-        'name',
-        'year',
-        'category',
+        "name",
+        "year",
+        "category",
     )
-    search_fields = ('name',)
-    list_filter = ('category',)
+    search_fields = ("name",)
+    list_filter = ("category",)
