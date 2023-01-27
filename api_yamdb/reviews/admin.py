@@ -24,14 +24,11 @@ class GenreAdmin(admin.ModelAdmin):
 
 
 @admin.register(Title)
-class TitleAdmin(admin.ModelAdmin):
+class TitlesAdmin(admin.ModelAdmin):
     list_display = (
-        'pk',
         'name',
         'year',
         'category',
-        'description',
     )
-    list_editable = ('category',)
     search_fields = ('name',)
-    list_filter = ('year',)
+    list_filter = ('category',)
