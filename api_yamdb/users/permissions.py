@@ -13,6 +13,6 @@ class IsAdmin(permissions.BasePermission):
 
 class IsModerator(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method == 'DELETE' and request.user.is_authenticated:
+        if request.user.is_authenticated:
             return request.user.role == MODERATOR
         return Response(status=403)
