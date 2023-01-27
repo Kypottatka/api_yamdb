@@ -10,6 +10,7 @@ class CreateListViewSet(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
+
     permission_classes = (AdminOrReadOnly,)
     filter_backends = (SearchFilter,)
     search_fields = ("name",)
