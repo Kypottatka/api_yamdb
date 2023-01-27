@@ -1,3 +1,8 @@
+# Migrations
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -148,3 +153,4 @@ dmypy.json
 # папки со статикой и медиа
 media/
 
+tests/
