@@ -3,36 +3,29 @@ from rest_framework.routers import DefaultRouter
 
 from . import views
 
-
-app_name = 'users'
+app_name = "users"
 
 users_router = DefaultRouter()
 
 users_router.register(
-    'users',
+    "users",
     views.UserViewSet,
-    basename='users',
+    basename="users",
 )
 users_router.register(
-    'signup',
+    "signup",
     views.SignUpViewSet,
-    basename='signup',
+    basename="signup",
 )
 users_router.register(
-    'token',
+    "token",
     views.GetJWTToken,
-    basename='token',
+    basename="token",
 )
 
 
 urlpatterns = [
-    path('', include(users_router.urls)),
-    path(
-        'auth/',
-        include(users_router.urls)
-    ),
-    path(
-        'auth/',
-        include('django.contrib.auth.urls')
-    ),
+    path("", include(users_router.urls)),
+    path("auth/", include(users_router.urls)),
+    path("auth/", include("django.contrib.auth.urls")),
 ]
