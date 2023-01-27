@@ -20,6 +20,8 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Title для [POST, PATCH]-запросов."""
+
     genre = serializers.SlugRelatedField(
         many=True,
         write_only=True,
@@ -55,6 +57,8 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 
 
 class TitleListSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Title для [GET]-запросов."""
+
     category = CategorySerializer(many=False, required=False)
     genre = GenreSerializer(many=True, required=False)
     rating = serializers.IntegerField()
@@ -74,6 +78,8 @@ class TitleListSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Review."""
+
     author = serializers.SlugRelatedField(
         slug_field="username",
         read_only=True,
@@ -97,6 +103,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Comment."""
+
     author = serializers.SlugRelatedField(
         slug_field="username",
         read_only=True,
