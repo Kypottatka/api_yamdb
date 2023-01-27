@@ -15,11 +15,10 @@ class Category(models.Model):
     class Meta:
         ordering = ('name',)
         verbose_name = 'Категория'
-        verbose_name_plural = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
-
 
 
 class Genre(models.Model):
@@ -30,7 +29,7 @@ class Genre(models.Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Жанры'
+        verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
@@ -78,7 +77,7 @@ class Review(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="reviewer",
+        related_name="reviews",
         verbose_name="Автор",
     )
     text = models.CharField(
