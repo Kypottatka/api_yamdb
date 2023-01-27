@@ -1,8 +1,7 @@
 from django.db.models import Avg
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, filters, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -12,7 +11,6 @@ from users.permissions import (
 )
 from .filtersets import TitleFilter
 from .mixins import CreateListViewSet
-
 from .pagination import CustomPagination
 from .serializers import (
     CategorySerializer,
@@ -22,7 +20,7 @@ from .serializers import (
     TitleListSerializer,
     TitleCreateSerializer,
 )
-from reviews.models import Category, Genre, Title, Review, Comment
+from reviews.models import Category, Genre, Title, Review
 
 
 class CategoryViewSet(CreateListViewSet):
@@ -85,11 +83,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title_id = self.kwargs.get("title_id")
         title = get_object_or_404(Title, id=title_id)
         serializer.save(author=self.request.user, title=title)
-
-    def perform_destroy(self, serializer):
-        review_id = self.kwargs.get("review_id")
-        review = get_object_or_404(Comment, id=review_id)
-        review.delete()
 
 
 class CommentViewSet(viewsets.ModelViewSet):
