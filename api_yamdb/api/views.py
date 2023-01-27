@@ -1,9 +1,9 @@
 from rest_framework.response import Response
-
 from rest_framework import viewsets, filters, status
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 
-from users.permissions import IsModerator, IsAuthorOrReadOnly, IsAdmin
+from users.permissions import IsModerator, IsAuthorOrReadOnly, IsAdmin, IsAdminOrReadOnly
 from .mixins import CreateListViewSet
 
 from .pagination import CustomPagination
@@ -15,7 +15,7 @@ from users.models import User
 class CategoryViewSet(CreateListViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     pagination_class = CustomPagination
@@ -24,7 +24,7 @@ class CategoryViewSet(CreateListViewSet):
 class GenreViewSet(CreateListViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     pagination_class = CustomPagination
@@ -34,7 +34,7 @@ class GenreViewSet(CreateListViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     ordering_fields = ('name',)
     pagination_class = CustomPagination
 
