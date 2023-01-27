@@ -4,34 +4,31 @@ from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import action, api_view
-from rest_framework.response import Response
 from rest_framework import viewsets, status, filters
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-)
 from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .serializers import (
     UserSerializer,
     SignUpSerializer,
+    TokenSerializer,
 )
 from .models import User
 from .permissions import IsAdmin
 from .pagination import UsersPagination
 
 
-@api_view(['POST'])
-def get_jwt_token(request):
-    serializer = UserSerializer(data=request.data)
+class GetJWTToken(viewsets.ModelViewSet):
+    serializer_class = TokenSerializer
 
-    if serializer.is_valid():
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         username = serializer.validated_data['username']
-        email = serializer.validated_data['email']
-        confirmation_code = serializer.data['confirmation_code']
-        user = get_object_or_404(User, username=username, email=email)
+        confirmation_code = serializer.validated_data['confirmation_code']
+        user = get_object_or_404(User, username=username)
 
         if check_password(confirmation_code, user.confirmation_code):
             token = AccessToken.for_user(user)
@@ -41,21 +38,13 @@ def get_jwt_token(request):
             )
 
         return Response(
-            {'confirmation_code': 'Не верный код подтверждения'},
+            serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    return Response(
-        serializer.errors,
-        status=status.HTTP_400_BAD_REQUEST
-    )
-
 
 class SignUpViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
     serializer_class = SignUpSerializer
-    permission_classes = (AllowAny,)
-    http_method_names = ['post']
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -66,21 +55,18 @@ class SignUpViewSet(viewsets.ModelViewSet):
         if User.objects.filter(email=email, username=username).exists():
             return Response(status=status.HTTP_200_OK)
 
-        if User.objects.filter(email=email).exists():
+        elif (
+            User.objects.filter(email=email).exists()
+                or User.objects.filter(username=username).exists()):
             return Response(
-                {'email': 'Пользователь с таким email уже существует'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if User.objects.filter(username=username).exists():
-            return Response(
-                {'username': 'Пользователь с таким username уже существует'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-
         confirmation_code = uuid.uuid4()
         user = User.objects.filter(email=email).exists()
+
         if not user:
             User.objects.create_user(email=email)
 
@@ -109,9 +95,9 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAdmin, IsAuthenticated,)
     pagination_class = UsersPagination
-    lookup_field = 'username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['username', ]
+    lookup_field = 'username'
 
     @action(
         detail=False,
@@ -124,7 +110,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = UserSerializer(request.user)
             return Response(
                 serializer.data,
-                status=200
+                status=status.HTTP_200_OK,
             )
         serializer = UserSerializer(
             request.user,
@@ -133,7 +119,10 @@ class UserViewSet(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save(role=request.user.role, partial=True)
-        return Response(serializer.data, status=200)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
 
     @action(
         detail=False,
@@ -143,8 +132,16 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.user.role != 'admin':
             return Response(
                 {'detail': 'У вас нет прав на удаление пользователей'},
-                status=403
+                status=status.HTTP_403_FORBIDDEN
             )
         user = get_object_or_404(User, username=request.data['username'])
         user.delete()
-        return Response(status=403)
+        return Response(status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        if request.method == 'PUT':
+            return Response(
+                {'detail': 'Метод PUT не разрешен'},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+        return super().update(request, *args, **kwargs)
