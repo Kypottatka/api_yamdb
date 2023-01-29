@@ -134,3 +134,14 @@ SIMPLE_JWT = {
 }
 
 EMAIL_ADMIN = 'admin@example.com'
+
+
+
+
+
+
+
+
+
+
+USER_USERNAME_LENGTH = 150

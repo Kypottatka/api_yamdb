@@ -1,11 +1,22 @@
 from django.db.models import Avg
-from rest_framework.filters import OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
+from django.conf import settings
+from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter
+from rest_framework import viewsets, status, filters
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    IsAuthenticated,
+)
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
 
-from users.permissions import (
+
+from .permissions import (
+    IsAdmin,
     AdminOrReadOnly,
     IsAdminModeratorAuthorOrReadOnly,
 )
@@ -19,8 +30,12 @@ from .serializers import (
     ReviewSerializer,
     TitleListSerializer,
     TitleCreateSerializer,
+    UserSerializer,
+    SignUpSerializer,
+    TokenSerializer,
 )
 from reviews.models import Category, Genre, Title, Review
+from users.models import User
 
 
 class CategoryViewSet(CreateListViewSet):
@@ -107,3 +122,120 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get("review_id")
         review = get_object_or_404(Review, id=review_id)
         serializer.save(author=self.request.user, review=review)
+
+
+class GetJWTToken(viewsets.ModelViewSet):
+    serializer_class = TokenSerializer
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        username = serializer.validated_data["username"]
+        confirmation_code = serializer.validated_data["confirmation_code"]
+        user = get_object_or_404(User, username=username)
+
+        if default_token_generator.check_token(user, confirmation_code):
+            token = AccessToken.for_user(user)
+            return Response({"token": f"{token}"}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SignUpViewSet(viewsets.ModelViewSet):
+    serializer_class = SignUpSerializer
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+        username = serializer.validated_data["username"]
+
+        if User.objects.filter(email=email, username=username).exists():
+            return Response(status=status.HTTP_200_OK)
+
+        elif (
+            User.objects.filter(email=email).exists()
+            or User.objects.filter(username=username).exists()
+        ):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        user, _ = User.objects.get_or_create(email=email)
+        confirmation_code = default_token_generator.make_token(user)
+
+        if not user:
+            User.objects.create_user(email=email)
+
+        mail_subject = "Код подтверждения"
+        message = f"Ваш код подтверждения: {confirmation_code}"
+        send_mail(
+            mail_subject,
+            message,
+            f"Yamdb <{settings.EMAIL_ADMIN}>",
+            [email],
+        )
+
+        return Response(
+            serializer.data, status=status.HTTP_200_OK, headers=headers
+        )
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAdmin,)
+    pagination_class = CustomPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+        "username",
+    ]
+    lookup_field = "username"
+
+    @action(
+        detail=False,
+        url_path="me",
+        methods=["GET", "PATCH"],
+        permission_classes=[
+            IsAuthenticated,
+        ],
+    )
+    def get_self_user_page(self, request):
+        if request.method == "GET":
+            serializer = self.get_serializer(request.user)
+
+        serializer = self.get_serializer(
+            request.user, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save(
+            role=request.user.role,
+            partial=True
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(
+        detail=False,
+        methods=["DELETE"],
+    )
+    def delete_user(self, request):
+        if not request.user.is_superuser:
+            return Response(
+                {"detail": "У вас нет прав на удаление пользователей"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        user = get_object_or_404(User, username=request.data["username"])
+        user.delete()
+        return Response(status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        if request.method == "PUT":
+            return Response(
+                {"detail": "Метод PUT не разрешен"},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+        return super().update(request, *args, **kwargs)
