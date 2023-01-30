@@ -1,16 +1,19 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.conf import settings
+
 from users.models import User
 
 
 class Category(models.Model):
     name = models.CharField(
-        max_length=256,
+        max_length=settings.NAME_MAX_LENGTH,
         verbose_name="Название",
         help_text="Заполните имя категории",
     )
     slug = models.SlugField(
-        max_length=50, unique=True, help_text="Поле с уникальным значением"
+        unique=True,
+        help_text="Поле с уникальным значением"
     )
 
     class Meta:
@@ -24,12 +27,13 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(
-        max_length=256,
+        max_length=settings.NAME_MAX_LENGTH,
         verbose_name="Название",
         help_text="Заполните имя жанра",
     )
     slug = models.SlugField(
-        max_length=50, unique=True, help_text="Поле с уникальным значением"
+        unique=True,
+        help_text="Поле с уникальным значением"
     )
 
     class Meta:
@@ -43,12 +47,13 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(
-        max_length=256,
+        max_length=settings.NAME_MAX_LENGTH,
         verbose_name="Название",
         help_text="Заполните название произведения",
     )
-    year = models.IntegerField(
-        verbose_name="Год выпуска", help_text="Заполните год выпуска"
+    year = models.SmallIntegerField(
+        verbose_name="Год выпуска",
+        help_text="Заполните год выпуска"
     )
     description = models.TextField(
         blank=True,
@@ -100,7 +105,7 @@ class Review(models.Model):
         verbose_name="Текст отзыва",
         help_text="Введите текст отзыва",
     )
-    score = models.IntegerField(
+    score = models.SmallIntegerField(
         verbose_name="Оценка",
         validators=(
             MinValueValidator(1, message="Убедитесь, что оценка не меньше 1."),

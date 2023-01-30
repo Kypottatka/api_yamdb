@@ -1,10 +1,9 @@
 import csv
-import datetime
 
 from django.core.management import BaseCommand
 
 from reviews.models import (
-    User, Category, Title, Genre, Comment, Review, GenreTitle)
+    User, Category, Title, Genre, Comment, Review)
 
 
 def iter_csv(file_path: str):
@@ -46,10 +45,11 @@ class Command(BaseCommand):
         for row in reader:
             title = Title(id=row['id'],
                           name=row['name'],
-                          year=datetime.datetime.strptime(row['year'], '%Y'),
+                          year=row['year'],
                           category=Category.objects.get(pk=row['category']),)
             title.save()
 
+        """
         reader = iter_csv('static/data/genre_title.csv')
         for row in reader:
             genre_title = GenreTitle(
@@ -57,6 +57,7 @@ class Command(BaseCommand):
                 title=Title.objects.get(pk=row['title_id']),
                 genre=Genre.objects.get(pk=row['genre_id']),)
             genre_title.save()
+        """
 
         reader = iter_csv('static/data/review.csv')
         for row in reader:
@@ -76,3 +77,5 @@ class Command(BaseCommand):
                               author=User.objects.get(pk=row['author']),
                               pub_date=row['pub_date'])
             comment.save()
+
+        return 'Done'

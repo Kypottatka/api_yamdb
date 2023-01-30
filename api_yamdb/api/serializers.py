@@ -1,5 +1,3 @@
-from datetime import date
-
 from rest_framework import serializers
 
 from reviews.models import Category, Genre, Title, Review, Comment
@@ -40,13 +38,6 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         required=False,
         queryset=Category.objects.all(),
     )
-
-    def validate_year(self, value):
-        if not 0 < value < date.today().year:
-            raise serializers.ValidationError(
-                f"Пока мы в {date.today().year}, пользователь уже в {value}"
-            )
-        return value
 
     class Meta:
         model = Title

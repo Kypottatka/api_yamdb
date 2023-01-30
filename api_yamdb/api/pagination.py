@@ -1,7 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
-
-PAGE_NUMBER = 10
+from django.conf import settings
 
 
 class CustomPagination(PageNumberPagination):
-    page_size = PAGE_NUMBER
+    page_size = settings.PAGE_NUMBER

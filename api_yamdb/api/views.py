@@ -89,15 +89,17 @@ class ReviewViewSet(viewsets.ModelViewSet):
     )
     pagination_class = CustomPagination
 
+    def get_title(self):
+        return get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+
     def get_queryset(self):
-        title_id = self.kwargs.get("title_id")
-        title = get_object_or_404(Title, id=title_id)
-        return title.reviews.all()
+        return self.get_title().reviews.all()
 
     def perform_create(self, serializer):
-        title_id = self.kwargs.get("title_id")
-        title = get_object_or_404(Title, id=title_id)
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(
+            author=self.request.user,
+            title=self.get_title(),
+        )
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -113,15 +115,17 @@ class CommentViewSet(viewsets.ModelViewSet):
     )
     pagination_class = CustomPagination
 
+    def get_comment(self):
+        return get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+
     def get_queryset(self):
-        review_id = self.kwargs.get("review_id")
-        review = get_object_or_404(Review, id=review_id)
-        return review.comments.all()
+        return self.get_comment().comments.all()
 
     def perform_create(self, serializer):
-        review_id = self.kwargs.get("review_id")
-        review = get_object_or_404(Review, id=review_id)
-        serializer.save(author=self.request.user, review=review)
+        serializer.save(
+            author=self.request.user,
+            review=self.get_comment(),
+        )
 
 
 class GetJWTToken(viewsets.ModelViewSet):

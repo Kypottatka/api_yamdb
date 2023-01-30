@@ -135,13 +135,8 @@ SIMPLE_JWT = {
 
 EMAIL_ADMIN = 'admin@example.com'
 
-
-
-
-
-
-
-
-
-
 USER_USERNAME_LENGTH = 150
+
+PAGE_NUMBER = 10
+
+NAME_MAX_LENGTH = 256

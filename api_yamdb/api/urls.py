@@ -23,8 +23,8 @@ v1_router.register(
     CommentViewSet,
     basename="comment",
 )
-v1_router.register(r"categories", CategoryViewSet, basename="category")
-v1_router.register(r"genres", GenreViewSet, basename="genre")
+v1_router.register("categories", CategoryViewSet, basename="category")
+v1_router.register("genres", GenreViewSet, basename="genre")
 
 users_router = DefaultRouter()
 users_router.register(
