@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core import validators
+from django.conf import settings
+
+from .validators import username_validator
 
 
 USER = "user"
@@ -17,24 +19,15 @@ ROLES = [
 class User(AbstractUser):
     username = models.CharField(
         verbose_name="Никнейм пользователя",
-        max_length=150,
+        max_length=settings.USER_USERNAME_LENGTH,
         unique=True,
         db_index=True,
-        validators=[
-            validators.RegexValidator(
-                regex=r"^[\w.@+-]+\Z",
-                message="Имя пользователя должно состоять "
-                "только из букв латинского алфавита, "
-                'цифр и символов "@/./+/-/_"',
-                code="invalid_username",
-            )
-        ],
+        validators=[username_validator],
     )
     email = models.EmailField(
         verbose_name="Электронная почта",
         max_length=254,
         unique=True,
-        validators=[validators.validate_email],
     )
     first_name = models.CharField(
         verbose_name="Имя",
@@ -54,11 +47,6 @@ class User(AbstractUser):
     )
     bio = models.TextField(
         verbose_name="О себе",
-        null=True,
-    )
-    confirmation_code = models.CharField(
-        verbose_name="Код подтверждения",
-        max_length=150,
         null=True,
     )
 

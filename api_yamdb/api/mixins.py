@@ -1,7 +1,7 @@
 from rest_framework import mixins, viewsets
 from rest_framework.filters import SearchFilter
 
-from users.permissions import AdminOrReadOnly
+from .permissions import AdminOrReadOnly
 
 
 class CreateListViewSet(
