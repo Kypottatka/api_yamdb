@@ -4,7 +4,9 @@ from django.core.management import BaseCommand
 from django.apps import apps
 
 app_models = apps.get_app_config('reviews').get_models()
-filepaths = [file for file in os.listdir("static/data/") if file.endswith('.csv')]
+filepaths = [
+    file for file in os.listdir("static/data/") if file.endswith('.csv')
+]
 
 
 def iter_csv(file_path: str):
