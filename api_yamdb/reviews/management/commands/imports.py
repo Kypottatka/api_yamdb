@@ -1,81 +1,30 @@
 import csv
-
+import os
 from django.core.management import BaseCommand
+from django.apps import apps
 
-from reviews.models import (
-    User, Category, Title, Genre, Comment, Review)
+app_models = apps.get_app_config('reviews').get_models()
+filepaths = [file for file in os.listdir("static/data/") if file.endswith('.csv')]
 
 
 def iter_csv(file_path: str):
-    with open(file_path, 'r') as inp_f:
-        reader = csv.DictReader(inp_f)
-        for row in reader:
-            yield row
+    try:
+        with open(file_path, 'r') as inp_f:
+            reader = csv.DictReader(inp_f)
+            for row in reader:
+                yield row
+    except Exception as e:
+        return f"Ошибка чтения csv-файла: {e}"
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-
-        reader = iter_csv('static/data/users.csv')
-        for row in reader:
-            user = User(id=row['id'],
-                        username=row['username'],
-                        email=row['email'],
-                        role=row['role'],
-                        bio=row['bio'],
-                        first_name=row['first_name'],
-                        last_name=row['last_name'])
-            user.save()
-
-        reader = iter_csv('static/data/category.csv')
-        for row in reader:
-            category = Category(id=row['id'],
-                                name=row['name'],
-                                slug=row['slug'])
-            category.save()
-
-        reader = iter_csv('static/data/genre.csv')
-        for row in reader:
-            genre = Genre(id=row['id'],
-                          name=row['name'],
-                          slug=row['slug'])
-            genre.save()
-
-        reader = iter_csv('static/data/titles.csv')
-        for row in reader:
-            title = Title(id=row['id'],
-                          name=row['name'],
-                          year=row['year'],
-                          category=Category.objects.get(pk=row['category']),)
-            title.save()
-
-        """
-        reader = iter_csv('static/data/genre_title.csv')
-        for row in reader:
-            genre_title = GenreTitle(
-                id=row['id'],
-                title=Title.objects.get(pk=row['title_id']),
-                genre=Genre.objects.get(pk=row['genre_id']),)
-            genre_title.save()
-        """
-
-        reader = iter_csv('static/data/review.csv')
-        for row in reader:
-            review = Review(id=row['id'],
-                            title=Title.objects.get(pk=row['title_id']),
-                            text=row['text'],
-                            author=User.objects.get(pk=row['author']),
-                            score=row['score'],
-                            pub_date=row['pub_date'])
-            review.save()
-
-        reader = iter_csv('static/data/comments.csv')
-        for row in reader:
-            comment = Comment(id=row['id'],
-                              review=Review.objects.get(pk=row['review_id']),
-                              text=row['text'],
-                              author=User.objects.get(pk=row['author']),
-                              pub_date=row['pub_date'])
-            comment.save()
-
-        return 'Done'
+        try:
+            for file in filepaths:
+                for model in app_models:
+                    reader = iter_csv(file)
+                    for row in reader:
+                        model.objects.bulk_create(**row)
+            return "Импорт БД завершён."
+        except Exception as e:
+            return f"Ошибка импорта: {e}"
