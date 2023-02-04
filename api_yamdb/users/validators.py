@@ -1,14 +1,11 @@
-import re
-
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
 
 def username_validator(username):
-    if not re.match(r'^[a-zA-Z0-9_]+$', username):
+    if username == 'me':
         raise ValidationError(
-            'Имя пользователя может содержать '
-            'только латинские буквы, цифры и символ подчеркивания.'
+            'Имя пользователя не может быть "me".'
         )
     if len(username) < 3:
         raise ValidationError(

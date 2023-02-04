@@ -5,9 +5,7 @@ class IsAdmin(permissions.BasePermission):
     """Проверка, что пользователь является администратором."""
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (
-            request.user.is_staff or request.user.is_admin
-        )
+        return request.user.is_authenticated and request.user.is_admin
 
 
 class IsModerator(permissions.BasePermission):

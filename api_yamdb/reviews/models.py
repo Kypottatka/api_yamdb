@@ -51,7 +51,7 @@ class Title(models.Model):
         verbose_name="Название",
         help_text="Заполните название произведения",
     )
-    year = models.SmallIntegerField(
+    year = models.PositiveSmallIntegerField(
         verbose_name="Год выпуска",
         help_text="Заполните год выпуска"
     )
@@ -105,7 +105,7 @@ class Review(models.Model):
         verbose_name="Текст отзыва",
         help_text="Введите текст отзыва",
     )
-    score = models.SmallIntegerField(
+    score = models.PositiveSmallIntegerField(
         verbose_name="Оценка",
         validators=(
             MinValueValidator(1, message="Убедитесь, что оценка не меньше 1."),

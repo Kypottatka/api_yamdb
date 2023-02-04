@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from .validators import username_validator
 
@@ -21,27 +22,26 @@ class User(AbstractUser):
         verbose_name="Никнейм пользователя",
         max_length=settings.USER_USERNAME_LENGTH,
         unique=True,
-        db_index=True,
-        validators=[username_validator],
+        validators=[username_validator, UnicodeUsernameValidator()],
     )
     email = models.EmailField(
         verbose_name="Электронная почта",
-        max_length=254,
+        max_length=settings.EMAIL_MAX_LENGTH,
         unique=True,
     )
     first_name = models.CharField(
         verbose_name="Имя",
-        max_length=150,
+        max_length=settings.USER_USERNAME_LENGTH,
         blank=True,
     )
     last_name = models.CharField(
         verbose_name="Фамилия",
-        max_length=150,
+        max_length=settings.USER_USERNAME_LENGTH,
         blank=True,
     )
     role = models.CharField(
         verbose_name="Роль",
-        max_length=150,
+        max_length=settings.USER_USERNAME_LENGTH,
         choices=ROLES,
         default=USER,
     )
@@ -61,15 +61,10 @@ class User(AbstractUser):
     def is_admin(self):
         return self.role == ADMIN
 
-    @property
-    def is_user(self):
-        return self.role == USER
-
     class Meta:
         ordering = ("username",)
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
-        unique_together = (("username", "email"),)
         constraints = [
             models.UniqueConstraint(
                 fields=["username", "email"], name="unique_username_email"
@@ -78,3 +73,10 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.username
+
+    def save(self, *args, **kwargs):
+        if self.is_superuser:
+            self.role = ADMIN
+        elif self.is_staff:
+            self.role = MODERATOR
+        super().save(*args, **kwargs)

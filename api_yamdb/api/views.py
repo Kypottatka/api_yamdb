@@ -14,7 +14,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-
 from .permissions import (
     IsAdmin,
     AdminOrReadOnly,
@@ -167,10 +166,6 @@ class SignUpViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         user, _ = User.objects.get_or_create(email=email)
         confirmation_code = default_token_generator.make_token(user)
-
-        if not user:
-            User.objects.create_user(email=email)
-
         mail_subject = "Код подтверждения"
         message = f"Ваш код подтверждения: {confirmation_code}"
         send_mail(
@@ -207,15 +202,15 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_self_user_page(self, request):
         if request.method == "GET":
             serializer = self.get_serializer(request.user)
-
-        serializer = self.get_serializer(
-            request.user, data=request.data, partial=True
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save(
-            role=request.user.role,
-            partial=True
-        )
+        else:
+            serializer = self.get_serializer(
+                request.user, data=request.data, partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save(
+                role=request.user.role,
+                partial=True
+            )
 
         return Response(
             serializer.data,
