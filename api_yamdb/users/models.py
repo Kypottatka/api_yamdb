@@ -31,17 +31,17 @@ class User(AbstractUser):
     )
     first_name = models.CharField(
         verbose_name="Имя",
-        max_length=settings.USER_USERNAME_LENGTH,
+        max_length=settings.USER_FIRSTNAME_LENGTH,
         blank=True,
     )
     last_name = models.CharField(
         verbose_name="Фамилия",
-        max_length=settings.USER_USERNAME_LENGTH,
+        max_length=settings.USER_LASTNAME_LENGTH,
         blank=True,
     )
     role = models.CharField(
         verbose_name="Роль",
-        max_length=settings.USER_USERNAME_LENGTH,
+        max_length=settings.USER_ROLE_LENGTH,
         choices=ROLES,
         default=USER,
     )
@@ -55,10 +55,14 @@ class User(AbstractUser):
 
     @property
     def is_moderator(self):
+        if self.is_staff:
+            self.role = MODERATOR
         return self.role == MODERATOR
 
     @property
     def is_admin(self):
+        if self.is_superuser:
+            self.role = ADMIN
         return self.role == ADMIN
 
     class Meta:
@@ -73,10 +77,3 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.username
-
-    def save(self, *args, **kwargs):
-        if self.is_superuser:
-            self.role = ADMIN
-        elif self.is_staff:
-            self.role = MODERATOR
-        super().save(*args, **kwargs)

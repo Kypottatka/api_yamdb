@@ -3,6 +3,7 @@ from django.db import models
 from django.conf import settings
 
 from users.models import User
+from users.validators import year_validator
 
 
 class Category(models.Model):
@@ -53,7 +54,8 @@ class Title(models.Model):
     )
     year = models.PositiveSmallIntegerField(
         verbose_name="Год выпуска",
-        help_text="Заполните год выпуска"
+        help_text="Заполните год выпуска",
+        validators=[year_validator],
     )
     description = models.TextField(
         blank=True,
