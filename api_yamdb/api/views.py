@@ -151,17 +151,6 @@ class SignUpViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data["email"]
-        username = serializer.validated_data["username"]
-
-        if User.objects.filter(email=email, username=username).exists():
-            return Response(status=status.HTTP_200_OK)
-
-        elif (
-            User.objects.filter(email=email).exists()
-            or User.objects.filter(username=username).exists()
-        ):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         user, _ = User.objects.get_or_create(email=email)
