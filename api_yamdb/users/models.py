@@ -20,28 +20,28 @@ ROLES = [
 class User(AbstractUser):
     username = models.CharField(
         verbose_name="Никнейм пользователя",
-        max_length=settings.USER_USERNAME_LENGTH,
+        max_length=settings.USER_FIELD_LENGTH,
         unique=True,
         validators=[username_validator, UnicodeUsernameValidator()],
     )
     email = models.EmailField(
         verbose_name="Электронная почта",
-        max_length=settings.EMAIL_MAX_LENGTH,
+        max_length=settings.USER_FIELD_LENGTH,
         unique=True,
     )
     first_name = models.CharField(
         verbose_name="Имя",
-        max_length=settings.USER_FIRSTNAME_LENGTH,
+        max_length=settings.USER_FIELD_LENGTH,
         blank=True,
     )
     last_name = models.CharField(
         verbose_name="Фамилия",
-        max_length=settings.USER_LASTNAME_LENGTH,
+        max_length=settings.USER_FIELD_LENGTH,
         blank=True,
     )
     role = models.CharField(
         verbose_name="Роль",
-        max_length=settings.USER_ROLE_LENGTH,
+        max_length=settings.USER_FIELD_LENGTH,
         choices=ROLES,
         default=USER,
     )
@@ -55,15 +55,11 @@ class User(AbstractUser):
 
     @property
     def is_moderator(self):
-        if self.is_staff:
-            self.role = MODERATOR
-        return self.role == MODERATOR
+        return (self.is_staff or self.role == MODERATOR)
 
     @property
     def is_admin(self):
-        if self.is_superuser:
-            self.role = ADMIN
-        return self.role == ADMIN
+        return (self.is_superuser or self.role == ADMIN)
 
     class Meta:
         ordering = ("username",)

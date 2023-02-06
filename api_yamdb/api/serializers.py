@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from rest_framework import serializers
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.conf import settings
@@ -136,7 +137,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(
-        max_length=settings.USER_USERNAME_LENGTH,
+        max_length=settings.USER_FIELD_LENGTH,
         required=True,
         validators=[
             username_validator,
@@ -149,20 +150,12 @@ class SignUpSerializer(serializers.Serializer):
     )
 
     def create(self, validated_data):
-        if User.objects.filter(
-            email=validated_data["email"],
-            username=validated_data["username"]
-        ).exists():
-            return User.objects.get(**validated_data)
-        if User.objects.filter(username=validated_data["username"]).exists():
-            raise serializers.ValidationError(
-                "Пользователь с таким именем уже существует."
-            )
-        if User.objects.filter(email=validated_data["email"]).exists():
+        try:
+            return User.objects.get_or_create(**validated_data)[0]
+        except IntegrityError:
             raise serializers.ValidationError(
                 "Пользователь с таким email уже существует."
             )
-        return User.objects.create_user(**validated_data)
 
 
 class TokenSerializer(serializers.Serializer):

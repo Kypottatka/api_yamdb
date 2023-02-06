@@ -150,10 +150,9 @@ class SignUpViewSet(viewsets.ModelViewSet):
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        user = serializer.save()
         email = serializer.validated_data["email"]
-        self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        user, _ = User.objects.get_or_create(email=email)
         confirmation_code = default_token_generator.make_token(user)
         mail_subject = "Код подтверждения"
         message = f"Ваш код подтверждения: {confirmation_code}"
