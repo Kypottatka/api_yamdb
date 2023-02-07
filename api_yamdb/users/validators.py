@@ -3,8 +3,7 @@ from django.conf import settings
 
 
 def username_validator(username):
-    username = username.lower()
-    if username == 'me':
+    if username.lower() == 'me':
         raise ValidationError(
             'Имя пользователя не может быть "me".'
         )

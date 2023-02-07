@@ -151,7 +151,6 @@ class SignUpViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        email = serializer.validated_data["email"]
         headers = self.get_success_headers(serializer.data)
         confirmation_code = default_token_generator.make_token(user)
         mail_subject = "Код подтверждения"
@@ -160,7 +159,7 @@ class SignUpViewSet(viewsets.ModelViewSet):
             mail_subject,
             message,
             f"Yamdb <{settings.EMAIL_ADMIN}>",
-            [email],
+            [user.email],
         )
 
         return Response(
